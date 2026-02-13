@@ -1,0 +1,51 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: chatbot-vercel-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Pano88Agro99
+      POSTGRES_DB: chatbot_db
+    ports:
+      - "5441:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: chatbot-vercel-pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: isaias@panoimagen.com
+      PGADMIN_DEFAULT_PASSWORD: Pano88Agro99
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+
+  redis:
+    image: redis
+    container_name: chatbot-vercel-redis
+    restart: always
+    command: redis-server --requirepass "Pano88Agro99" --appendonly yes
+    ports:
+      - "6351:6379"
+    volumes:
+      - redisdata:/data
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: chatbot-vercel-redis-ui
+    restart: always
+    environment:
+      # Formato: etiqueta:host:puerto:0:contraseña
+      - REDIS_HOSTS=local:redis:6379:0:Pano88Agro99
+    ports:
+      - "8099:8081"
+    depends_on:
+      - redis
+
+volumes:
+  pgdata:
+  redisdata:

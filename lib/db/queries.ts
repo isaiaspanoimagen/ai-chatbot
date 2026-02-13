@@ -38,7 +38,15 @@ import { generateHashedPassword } from "./utils";
 // https://authjs.dev/reference/adapter/drizzle
 
 // biome-ignore lint: Forbidden non-null assertion.
-const client = postgres(process.env.POSTGRES_URL!);
+const isLocal = process.env.POSTGRES_URL?.includes("localhost") || process.env.POSTGRES_URL?.includes("127.0.0.1");
+
+const client = postgres(process.env.POSTGRES_URL!, {
+  // En local desactivamos SSL (false), en producción lo requerimos ('require')
+  ssl: isLocal ? false : "require",
+  // prepare: false ayuda a evitar errores de caché en entornos serverless como Vercel
+  prepare: false, 
+});
+
 const db = drizzle(client);
 
 export async function getUser(email: string): Promise<User[]> {
@@ -232,12 +240,10 @@ export async function getChatsByUserId({
 export async function getChatById({ id }: { id: string }) {
   try {
     const [selectedChat] = await db.select().from(chat).where(eq(chat.id, id));
-    if (!selectedChat) {
-      return null;
-    }
-
-    return selectedChat;
-  } catch (_error) {
+    return selectedChat || null;
+  } catch (error) {
+    console.error("❌ ERROR REAL en getChatById:", error); 
+    
     throw new ChatSDKError("bad_request:database", "Failed to get chat by id");
   }
 }
