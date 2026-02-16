@@ -25,7 +25,8 @@ import { ArtifactCloseButton } from "./artifact-close-button";
 import { ArtifactMessages } from "./artifact-messages";
 import { MultimodalInput } from "./multimodal-input";
 import { Toolbar } from "./toolbar";
-import { useSidebar } from "./ui/sidebar";
+// 1. ELIMINAMOS EL IMPORT DE useSidebar PORQUE YA NO EXISTE
+// import { useSidebar } from "./ui/sidebar";
 import { VersionFooter } from "./version-footer";
 import type { VisibilityType } from "./visibility-selector";
 
@@ -104,7 +105,10 @@ function PureArtifact({
   const [document, setDocument] = useState<Document | null>(null);
   const [currentVersionIndex, setCurrentVersionIndex] = useState(-1);
 
-  const { open: isSidebarOpen } = useSidebar();
+  // 2. ELIMINAMOS EL HOOK useSidebar
+  // const { open: isSidebarOpen } = useSidebar(); 
+  // Asumimos que no hay sidebar, así que siempre es "cerrado" (full width)
+  const isSidebarOpen = false; 
 
   useEffect(() => {
     if (documents && documents.length > 0) {
@@ -231,12 +235,6 @@ function PureArtifact({
 
   const [isToolbarVisible, setIsToolbarVisible] = useState(false);
 
-  /*
-   * NOTE: if there are no documents, or if
-   * the documents are being fetched, then
-   * we mark it as the current version.
-   */
-
   const isCurrentVersion =
     documents && documents.length > 0
       ? currentVersionIndex === documents.length - 1
@@ -277,11 +275,11 @@ function PureArtifact({
               animate={{ width: windowWidth, right: 0 }}
               className="fixed h-dvh bg-background"
               exit={{
-                width: isSidebarOpen ? windowWidth - 256 : windowWidth,
+                width: windowWidth, // 3. Eliminamos lógica de isSidebarOpen
                 right: 0,
               }}
               initial={{
-                width: isSidebarOpen ? windowWidth - 256 : windowWidth,
+                width: windowWidth, // 3. Eliminamos lógica de isSidebarOpen
                 right: 0,
               }}
             />
